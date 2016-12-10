@@ -1,12 +1,14 @@
 package com.pokemongobot.listeners;
 
+import com.pokegoapi.exceptions.LoginFailedException;
+import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokemongobot.tasks.BotActivity;
 
 import java.util.List;
 
 public interface HeartBeatListener {
 
-    void heartBeat();
+    void heartBeat() throws LoginFailedException, RemoteServerException;
 
     int incrementHeartBeat();
 

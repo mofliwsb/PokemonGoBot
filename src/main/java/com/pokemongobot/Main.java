@@ -8,6 +8,9 @@ import com.pokegoapi.auth.PtcCredentialProvider;
 import com.pokegoapi.exceptions.AsyncPokemonGoException;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
+import com.pokegoapi.google.common.geometry.S2LatLng;
+
+import javafx.stage.Stage;
 import okhttp3.Authenticator;
 import okhttp3.OkHttpClient;
 import org.fusesource.jansi.Ansi;
@@ -19,7 +22,7 @@ import java.net.Proxy;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-public class Main {
+public class Main extends javafx.application.Application {
 
     public Main() {
         try {
@@ -36,12 +39,15 @@ public class Main {
     }
 
     public static void main(String[] args) throws Exception {
+    	S2LatLng s2 = new S2LatLng();
         AnsiConsole.systemInstall();
         System.out.println(Ansi.ansi().fg(Ansi.Color.RED).a("Starting bot in 5..."));
         System.out.println(Ansi.ansi().fg(Ansi.Color.RED).a("Change location now before start!"));
         Thread.sleep(5000);
 
-        new Main();
+		javafx.application.Application.launch(args);
+
+		new Main();
     }
 
     public static PokemonGo buildPokemonGo(Options option) throws LoginFailedException, RemoteServerException {
@@ -74,7 +80,9 @@ public class Main {
         } else {
             credentialProvider = ptcAuthentication(client, option.getUsername(), option.getPassword());
         }
-        PokemonGo pokemonGo = new PokemonGo(credentialProvider, client);
+        PokemonGo pokemonGo = new PokemonGo(client);
+        pokemonGo.login(credentialProvider);
+        
         DeviceInfo deviceInfo = DeviceInfo.DEFAULT;
         pokemonGo.setDeviceInfo(deviceInfo);
         return pokemonGo;
@@ -87,5 +95,11 @@ public class Main {
     private static CredentialProvider googleAuthentication(OkHttpClient client, String username, String password) throws LoginFailedException, RemoteServerException {
         return new GoogleAutoCredentialProvider(client, username, password);
     }
+
+	@Override
+	public void start(Stage primaryStage) throws Exception {
+		// TODO Auto-generated method stub
+		
+	}
 
 }

@@ -1,6 +1,5 @@
 package com.pokemongobot.listeners;
 
-import com.pokegoapi.google.common.geometry.S2LatLng;
 import com.pokemongobot.PokemonBot;
 import com.pokemongobot.actions.CatchPokemon;
 import org.apache.log4j.Logger;
@@ -16,9 +15,9 @@ public class SimpleLocationListener implements LocationListener {
     }
 
     @Override
-    public void updateCurrentLocation(S2LatLng point) {
-        if (bot.getOptions().isCatchPokemon())
-            CatchPokemon.catchPokemon(logger, bot.getCatchablePokemon());
+    public void updateCurrentLocation() {
+//        if (bot.getOptions().isCatchPokemon())
+//            CatchPokemon.catchPokemon(logger, bot, bot.getCatchablePokemon());
     }
 
     @Override

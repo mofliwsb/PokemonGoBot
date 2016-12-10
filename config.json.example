@@ -4,64 +4,131 @@
     "BotOne": {
       "proxy_comment": "proxy to use leave, ip, port, user, password blank to not use proxy",
       "proxy": {
-        "ip": "192.168.2.1",
-        "port": "8080",
+        "ip": "",
+        "port": "",
         "login_comment": "leave user, password blank if proxy doesn't require authentication",
-        "user": "trump",
-        "password": "build_it_tall"
+        "user": "",
+        "password": ""
       },
       "login_description": "google login, replace with ptc for ptc login",
       "google": {
-        "username": "example_username",
-        "password": "example_password"
+        "username": "xxx",
+        "password": "xxx"
       },
+
       "location": {
-        "latitude": "80",
-        "longitude": "100",
+        "latitude": "37.8099274",
+        "longitude": "-122.4109625",
+
         "walking_step_distance_comment": "how long a step is in meters, 1 is a good number",
-        "walking_step_distance": "1",
+        "walking_step_distance": "2",
         "max_speed_walking_comment": "max walking speed in meters per second",
-        "max_speed_walking": "4",
-        "running_step_distance": "5",
+
+        "max_speed_walking": "4.4",
+        "avg_speed_walking": "6",
+        "speed_range": "0.4",
+
+        "location_update_interval_ms": "500",
+        "heart_beat_interval_ms": "15000",
+
+        "running_step_distance": "4",
         "max_distance_comment": "max distance bot can get from starting location in meters, set to -1 to ignore",
         "max_distance": "1000",
         "time_reset_comment": "time until bot resets to start location in seconds, set to -1 to ignore",
-        "time_reset": "240"
+        "time_reset": "-1"
       },
+
+      "drop_item": {
+          "balls_to_keep": "250",
+          "potions_to_keep": "40",
+          "revives_to_keep": "40",
+          "berries_to_keep": "20"
+      },
+
       "farming_comment": "bot objectives can be set here. example: catch_pokemon: false, loot_pokestops: false, manage_eggs: true, bot will just walk around to incubate egg",
       "farming": {
         "catch_pokemon": "true",
         "loot_pokestops": "true",
+
         "manage_eggs_comment": "automatically incubate eggs etc",
-        "manage_eggs": "true",
+        "manage_eggs": "false",
+
         "evolve_pokemon": {
           "evolve": "true",
           "keep_unevolved_comment": "add pokemon names you don't want evolved. list of names in pokemon_names.txt",
           "keep_unevolved": [
             "ABRA",
             "KADABRA"
-          ]
-        },
-        "transfer_pokemon": {
-          "transfer": "true",
-          "iv_over_cp_comment": "treat iv as more important than cp",
-          "iv_over_cp": "false",
-          "threshold_comment": "minimum iv, cp to keep pokemon",
-          "threshold_iv": "80",
-          "treshold_cp": "400",
-          "obligatory_comment": "transfer regardless of cp, iv",
-          "obligatory": [
-            "DODUO",
-            "RATTATA",
-            "CATERPIE",
-            "PIDGEY"
           ],
-          "protect_comment": "add pokemon names you don't want to transfer. list of names in pokemon_names.txt",
-          "protect": [
-            "EEVEE",
-            "MEWTWO"
+          "only_evolve": [
+            "PIDGEY",
+            "RATTATA",
+            "PSYDUCK",
+            "TENTACOOL",
+            "POLIWAG",
+            ""
           ]
         }
+      },
+
+      "transfer_pokemon": {
+        "transfer": "true",
+        "iv_over_cp_comment": "treat iv as more important than cp",
+        "iv_over_cp": "false",
+        "threshold_comment": "minimum iv, cp to keep pokemon",
+        "threshold_iv": "20",
+        "treshold_cp": "30",
+        "transfer_filters": [
+            {
+                "level_range": 3,
+                "iv_min": 40
+            },
+            {
+                "level_range": 5,
+                "iv_min": 50
+            },
+            {
+                "level_range": 7,
+                "iv_min": 60
+            },
+            {
+                "level_range": 9,
+                "iv_min": 70
+            },
+            {
+                "level_range": 12,
+                "iv_min": 75
+            },
+            {
+                "level_range": 15,
+                "iv_min": 80
+            },
+            {
+                "level_range": 18,
+                "iv_min": 85
+            },
+            {
+                "level_range": 24,
+                "iv_min": 90
+            }
+        ],
+        "obligatory_comment": "transfer regardless of cp, iv",
+        "obligatory": [
+          "DODUO",
+          "CATERPIE",
+        ],
+        "protect_comment": "add pokemon names you don't want to transfer. list of names in pokemon_names.txt",
+        "protect": [
+          "LAPRAS",
+          "AERODACTYL",
+          "SNORLAX",
+          "ARTICUNO",
+          "ZAPDOS",
+          "MOLTRES",
+          "DRAGONITE",
+          "MEW",
+          "MEWTWO"
+        ]
       }
     }
   }

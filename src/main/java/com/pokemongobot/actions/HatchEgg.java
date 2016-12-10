@@ -37,7 +37,7 @@ public class HatchEgg {
         return inventories.getIncubators().stream().filter(eggIncubator -> {
             try {
                 return eggIncubator.isInUse();
-            } catch (LoginFailedException | RemoteServerException | AsyncPokemonGoException e) {
+            } catch (AsyncPokemonGoException e) {
                 return false;
             }
         }).collect(Collectors.toList());

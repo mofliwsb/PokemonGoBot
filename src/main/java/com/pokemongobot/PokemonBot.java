@@ -4,6 +4,8 @@ import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.inventory.Inventories;
 import com.pokegoapi.api.map.Map;
 import com.pokegoapi.api.map.pokemon.CatchablePokemon;
+import com.pokegoapi.exceptions.LoginFailedException;
+import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.google.common.geometry.S2LatLng;
 import com.pokemongobot.actions.BotWalker;
 
@@ -27,9 +29,9 @@ public interface PokemonBot {
 
     PokemonGo getApi();
 
-    void wander();
+    void wander() throws LoginFailedException, RemoteServerException;
 
-    boolean fixSoftBan(S2LatLng destination);
+    boolean fixSoftBan(S2LatLng destination)  throws LoginFailedException, RemoteServerException;
 
     Options getOptions();
 

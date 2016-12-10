@@ -13,9 +13,9 @@ import java.util.List;
 
 public class EvolvePokemon {
 
-    public static List<EvolutionResult> evolvePokemon(Logger logger, List<Pokemon> pokemons, CandyJar candyJar) {
+    public static List<EvolutionResult> evolvePokemon(Logger logger, List<Pokemon> pokemons, CandyJar candyJar) throws LoginFailedException, RemoteServerException {
         List<EvolutionResult> results = new ArrayList<>();
-        pokemons.forEach(pokemon -> {
+        for(Pokemon pokemon : pokemons){
             int candies = candyJar.getCandies(pokemon.getPokemonFamily());
             int candiesEvolve = pokemon.getCandiesToEvolve();
             if(candies >= candiesEvolve) {
@@ -23,22 +23,18 @@ public class EvolvePokemon {
                 if(result != null)
                     results.add(result);
             }
-        });
+        }
         return results;
     }
 
-    public static EvolutionResult evolve(Logger logger, Pokemon pokemon) {
-        try {
-            if (pokemon == null)
-                return null;
-            EvolutionResult result = pokemon.evolve();
-            if(result.isSuccessful()) {
-                logger.info("Evolved pokemon " + pokemon.getPokemonId().name() + " to " + result.getEvolvedPokemon().getPokemonId().name());
-            }
-        } catch (AsyncPokemonGoException | LoginFailedException | RemoteServerException e) {
-            logger.debug("Error evolving pokemon", e);
+    public static EvolutionResult evolve(Logger logger, Pokemon pokemon) throws LoginFailedException, RemoteServerException {
+        if (pokemon == null)
+            return null;
+        EvolutionResult result = pokemon.evolve();
+        if(result.isSuccessful()) {
+            logger.info("Evolved pokemon " + pokemon.getPokemonId().name() + " to " + result.getEvolvedPokemon().getPokemonId().name());
         }
-        return null;
+        return result;
     }
 
 }

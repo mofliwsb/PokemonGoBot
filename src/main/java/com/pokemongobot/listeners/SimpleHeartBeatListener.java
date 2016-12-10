@@ -1,5 +1,7 @@
 package com.pokemongobot.listeners;
 
+import com.pokegoapi.exceptions.LoginFailedException;
+import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokemongobot.PokemonBot;
 import com.pokemongobot.tasks.BotActivity;
 import org.apache.log4j.Logger;
@@ -26,20 +28,22 @@ public class SimpleHeartBeatListener implements HeartBeatListener {
 
 
     @Override
-    public synchronized void heartBeat()
+    public synchronized void heartBeat() throws LoginFailedException, RemoteServerException
     {
         if (shouldPulse() && (incrementHeartBeat() % heartbeatPace == 0))
         {
             updateLastPulse();
             setHeartBeatCount(1);
-            getHeartbeatActivities().forEach(BotActivity::performActivity);
+            for(BotActivity activity : getHeartbeatActivities()){
+            	activity.performActivity();
+            }
         }
     }
 
     public synchronized boolean shouldPulse()
     {
         long diff = System.currentTimeMillis() - getLastPulse();
-        return diff > 1000;
+        return diff > 5000;
     }
 
     public synchronized long getLastPulse()

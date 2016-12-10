@@ -57,9 +57,18 @@ public class Config {
             }
 
             JSONObject location = (JSONObject) jsonObject.get("location");
+            
+            option.setLocationUpdateIntervalMs(location.getInt("location_update_interval_ms"));
+            option.setHeartBeatIntervalMs(location.getInt("heart_beat_interval_ms"));
+            
             option.setStartingLocation(S2LatLng.fromDegrees(location.getDouble("latitude"), location.getDouble("longitude")));
             option.setWalkingStepDistance(location.getDouble("walking_step_distance"));
+            option.setRunningStepDistance(location.getDouble("running_step_distance"));
+            
             option.setMaxWalkingSpeed(location.getDouble("max_speed_walking"));
+            option.setAvgWalkingSpeed(location.getDouble("avg_speed_walking"));
+            option.setSpeedRange(location.getDouble("speed_range"));
+
             double maxDistance = location.getDouble("max_distance");
             if (maxDistance < 0D) {
                 option.setMaxDistance(Double.POSITIVE_INFINITY);
@@ -74,9 +83,16 @@ public class Config {
                 option.setTimeReset(maxTime);
             }
 
+            JSONObject dropping = (JSONObject) jsonObject.get("drop_item");
+            option.setBallsToKeep(dropping.getInt("balls_to_keep"));
+            option.setPotionsToKeep(dropping.getInt("potions_to_keep"));
+            option.setRevivesToKeep(dropping.getInt("revives_to_keep"));
+            option.setBerriesToKeep(dropping.getInt("berries_to_keep"));
+            
+            
             JSONObject farming = (JSONObject) jsonObject.get("farming");
             option.setCatchPokemon(farming.getBoolean("catch_pokemon"));
-            option.setCatchPokemon(farming.getBoolean("loot_pokestops"));
+            option.setLootPokestops(farming.getBoolean("loot_pokestops"));
             option.setManageEggs(farming.getBoolean("manage_eggs"));
 
             JSONObject evolve = (JSONObject) farming.get("evolve_pokemon");
@@ -87,6 +103,12 @@ public class Config {
                 keepUn.add(keepUnevolved.getString(i));
             }
             option.setKeepUnevolved(keepUn);
+            JSONArray onlyEvolve = evolve.getJSONArray("only_evolve");
+            List<String> onlyEvolvePokemons = new ArrayList<>(onlyEvolve.length());
+            for (int i = 0; i < onlyEvolve.length(); i++) {
+            	onlyEvolvePokemons.add(onlyEvolve.getString(i));
+            }
+            option.setOnlyEvolvePokemons(onlyEvolvePokemons);
 
             JSONObject transfer = (JSONObject) jsonObject.get("transfer_pokemon");
             option.setTransferPokemon(transfer.getBoolean("transfer"));
@@ -94,6 +116,15 @@ public class Config {
             option.setIv(transfer.getInt("threshold_iv"));
             option.setCp(transfer.getInt("treshold_cp"));
 
+            JSONArray filters = (JSONArray) transfer.get("transfer_filters");
+            List<Options.TransferFilter> transferFilters = new ArrayList<Options.TransferFilter>();
+            for(int i=0;i<filters.length();i++){
+            	JSONObject obj = filters.getJSONObject(i);
+            	Options.TransferFilter transferFilter = option.new TransferFilter(obj.getInt("level_range"), obj.getInt("iv_min"));
+            	transferFilters.add(transferFilter);
+            }
+            option.setTransferFilters(transferFilters);
+            
             JSONArray obligatory = (JSONArray) transfer.get("obligatory");
             List<String> ob = new ArrayList<>(obligatory.length());
             for (int i = 0; i < obligatory.length(); i++) {
@@ -106,7 +137,7 @@ public class Config {
             for (int i = 0; i < protect.length(); i++) {
                 prot.add(protect.getString(i));
             }
-            option.setObligatory(prot);
+            option.setProtect(prot);
 
             options.add(option);
 

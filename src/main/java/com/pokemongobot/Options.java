@@ -16,17 +16,29 @@ public class Options {
     private String password;
 
     private S2LatLng startingLocation;
-    private double walkingStepDistance;
+    private int locationUpdateIntervalMs;
+    private int heartBeatIntervalMs;
+    
+	private double walkingStepDistance;
     private double maxWalkingSpeed;
-    private double runningStepDistance;
+    private double avgWalkingSpeed;
+    private double speedRange;
+    
+	private double runningStepDistance;
     private double maxDistance;
     private double timeReset;
 
+	private int ballsToKeep;
+    private int potionsToKeep;
+    private int revivesToKeep;
+    private int berriesToKeep;
+    
     private boolean catchPokemon;
     private boolean lootPokestops;
     private boolean manageEggs;
     private boolean evolve;
     private List<String> keepUnevolved;
+    private List<String> onlyEvolvePokemons;
 
     private boolean transferPokemon;
     private boolean ivOverCp;
@@ -34,6 +46,16 @@ public class Options {
     private int cp;
     private List<String> obligatory;
     private List<String> protect;
+    
+    public class TransferFilter{
+    	public int level_range;
+    	public int iv_min;
+    	public TransferFilter(int level_range, int iv_min){
+    		this.level_range = level_range;
+    		this.iv_min = iv_min;
+    	}
+    }
+    private List<TransferFilter> transferFilters;
 
     public Options() {
 
@@ -183,6 +205,14 @@ public class Options {
         this.keepUnevolved = keepUnevolved;
     }
 
+    public List<String> getOnlyEvolvePokemons() {
+        return onlyEvolvePokemons;
+    }
+
+    public void setOnlyEvolvePokemons(List<String> onlyEvolvePokemons) {
+        this.onlyEvolvePokemons = onlyEvolvePokemons;
+    }
+
     public boolean isTransferPokemon() {
         return transferPokemon;
     }
@@ -222,4 +252,78 @@ public class Options {
     public void setProtect(List<String> protect) {
         this.protect = protect;
     }
+    
+    public List<TransferFilter> getTransferFilters(){
+    	return transferFilters;
+    }
+
+    public void setTransferFilters(List<TransferFilter> filters){
+    	transferFilters = filters;
+    }
+
+    public int getLocationUpdateIntervalMs() {
+		return locationUpdateIntervalMs;
+	}
+
+	public void setLocationUpdateIntervalMs(int locationUpdateIntervalMs) {
+		this.locationUpdateIntervalMs = locationUpdateIntervalMs;
+	}
+
+    public double getAvgWalkingSpeed() {
+		return avgWalkingSpeed;
+	}
+
+	public void setAvgWalkingSpeed(double avgWalkingSpeed) {
+		this.avgWalkingSpeed = avgWalkingSpeed;
+	}
+
+	public double getSpeedRange() {
+		return speedRange;
+	}
+
+	public void setSpeedRange(double speedRange) {
+		this.speedRange = speedRange;
+	}
+
+	public int getHeartBeatIntervalMs() {
+		return heartBeatIntervalMs;
+	}
+
+	public void setHeartBeatIntervalMs(int heartBeatIntervalMs) {
+		this.heartBeatIntervalMs = heartBeatIntervalMs;
+	}
+
+
+    public int getBallsToKeep() {
+		return ballsToKeep;
+	}
+
+	public void setBallsToKeep(int ballsToKeep) {
+		this.ballsToKeep = ballsToKeep;
+	}
+
+	public int getPotionsToKeep() {
+		return potionsToKeep;
+	}
+
+	public void setPotionsToKeep(int potionsToKeep) {
+		this.potionsToKeep = potionsToKeep;
+	}
+
+	public int getRevivesToKeep() {
+		return revivesToKeep;
+	}
+
+	public void setRevivesToKeep(int revivesToKeep) {
+		this.revivesToKeep = revivesToKeep;
+	}
+
+	public int getBerriesToKeep() {
+		return berriesToKeep;
+	}
+
+	public void setBerriesToKeep(int berriesToKeep) {
+		this.berriesToKeep = berriesToKeep;
+	}
+    
 }
