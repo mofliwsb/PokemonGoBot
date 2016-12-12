@@ -9,6 +9,7 @@ import org.apache.log4j.Logger;
 import com.pokegoapi.api.inventory.CandyJar;
 import com.pokegoapi.api.inventory.Inventories;
 import com.pokegoapi.api.pokemon.Pokemon;
+import com.pokegoapi.exceptions.CaptchaActiveException;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokemongobot.Options;
@@ -29,7 +30,7 @@ public class EvolvePokemonActivity implements BotActivity {
 	}
 	
 	@Override
-	public void performActivity() throws LoginFailedException, RemoteServerException {
+	public void performActivity() throws LoginFailedException, RemoteServerException, CaptchaActiveException {
         Inventories inventories = pokemonBot.getInventory();
         if (inventories == null)
             return;

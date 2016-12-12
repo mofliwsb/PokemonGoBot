@@ -28,7 +28,17 @@ public class Options {
     private double maxDistance;
     private double timeReset;
 
-	private int ballsToKeep;
+	private S2LatLng snipeLocation;
+    private String snipePokemonName;
+
+    private boolean snipe;
+	private int snipeLocationUpdateIntervalMs;
+    private int snipeHeartBeatIntervalMs;
+    private double snipeAvgWalkingSpeed;
+    private double SnipeSpeedRange;
+    
+
+    private int ballsToKeep;
     private int potionsToKeep;
     private int revivesToKeep;
     private int berriesToKeep;
@@ -326,4 +336,61 @@ public class Options {
 		this.berriesToKeep = berriesToKeep;
 	}
     
+    public S2LatLng getSnipeLocation() {
+		return snipeLocation;
+	}
+
+	public void setSnipeLocation(S2LatLng snipeLocation) {
+		this.snipeLocation = snipeLocation;
+	}
+
+	public String getSnipePokemonName() {
+		return snipePokemonName;
+	}
+
+	public void setSnipePokemonName(String snipePokemonName) {
+		this.snipePokemonName = snipePokemonName;
+	}
+
+    public int getSnipeLocationUpdateIntervalMs() {
+		return snipeLocationUpdateIntervalMs;
+	}
+
+	public void setSnipeLocationUpdateIntervalMs(int snipeLocationUpdateIntervalMs) {
+		this.snipeLocationUpdateIntervalMs = snipeLocationUpdateIntervalMs;
+	}
+
+	public int getSnipeHeartBeatIntervalMs() {
+		return snipeHeartBeatIntervalMs;
+	}
+
+	public void setSnipeHeartBeatIntervalMs(int snipeHeartBeatIntervalMs) {
+		this.snipeHeartBeatIntervalMs = snipeHeartBeatIntervalMs;
+	}
+
+	public double getSnipeAvgWalkingSpeed() {
+		return snipeAvgWalkingSpeed;
+	}
+
+	public void setSnipeAvgWalkingSpeed(double snipeAvgWalkingSpeed) {
+		this.snipeAvgWalkingSpeed = snipeAvgWalkingSpeed;
+	}
+
+	public double getSnipeSpeedRange() {
+		return SnipeSpeedRange;
+	}
+
+	public void setSnipeSpeedRange(double snipeSpeedRange) {
+		SnipeSpeedRange = snipeSpeedRange;
+	}
+	
+	public boolean isSnipe() {
+		return snipe;
+	}
+
+	public void setSnipe(boolean snipe) {
+		this.snipe = snipe;
+	}
+
+
 }

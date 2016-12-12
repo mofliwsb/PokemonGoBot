@@ -8,6 +8,7 @@ import com.pokegoapi.api.map.pokemon.CatchResult;
 import com.pokegoapi.api.map.pokemon.CatchablePokemon;
 import com.pokegoapi.api.map.pokemon.encounter.EncounterResult;
 import com.pokegoapi.api.settings.CatchOptions;
+import com.pokegoapi.api.settings.PokeballSelector;
 import com.pokegoapi.exceptions.*;
 import com.pokemongobot.PokemonBot;
 
@@ -31,7 +32,7 @@ public class CatchPokemon {
 	}
 
 	public static List<CatchResult> catchPokemon(Logger logger, PokemonBot pokemonBot, List<CatchablePokemon> pokemonList)
-	throws LoginFailedException, RemoteServerException
+	throws LoginFailedException, RemoteServerException, CaptchaActiveException
 	{
 		logPokeballs(logger, pokemonBot);
         List<CatchResult> results = new ArrayList<>(pokemonList.size());
@@ -50,16 +51,15 @@ public class CatchPokemon {
         return results;
     }
 
-    public static CatchResult attemptCatch(Logger logger, PokemonBot pokemonBot, CatchablePokemon pokemon) throws LoginFailedException, RemoteServerException {
+    public static CatchResult attemptCatch(Logger logger, PokemonBot pokemonBot, CatchablePokemon pokemon) throws LoginFailedException, RemoteServerException, CaptchaActiveException {
         try {
             EncounterResult encounterResult = pokemon.encounterPokemon();
             if (encounterResult == null || !encounterResult.wasSuccessful())
                 return null;
 
             CatchOptions catchOptions = new CatchOptions(pokemonBot.getApi());
-            catchOptions.usePokeball(Pokeball.ULTRABALL);
+            catchOptions.withPokeballSelector(PokeballSelector.SMART);
             catchOptions.maxPokeballs(3);
-            catchOptions.withProbability(0.3);	// use best ball if probability is more than 0.2
             
             CatchResult catchResult;
             catchResult = pokemon.catchPokemon(encounterResult, catchOptions);

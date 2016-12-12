@@ -1,6 +1,7 @@
 package com.pokemongobot.tasks;
 
 import com.pokegoapi.api.map.pokemon.CatchResult;
+import com.pokegoapi.exceptions.CaptchaActiveException;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokemongobot.PokemonBot;
@@ -19,12 +20,12 @@ public class CatchPokemonActivity implements BotActivity {
         this.logger = Logger.getLogger(Thread.currentThread().getName());
     }
 
-    public List<CatchResult> catchNearbyPokemon() throws LoginFailedException, RemoteServerException {
+    public List<CatchResult> catchNearbyPokemon() throws LoginFailedException, RemoteServerException, CaptchaActiveException {
         return CatchPokemon.catchPokemon(logger, pokemonBot, pokemonBot.getCatchablePokemon());
     }
 
     @Override
-    public void performActivity() throws LoginFailedException, RemoteServerException {
+    public void performActivity() throws LoginFailedException, RemoteServerException, CaptchaActiveException {
         catchNearbyPokemon();
     }
 

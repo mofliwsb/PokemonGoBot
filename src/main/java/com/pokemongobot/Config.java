@@ -83,6 +83,17 @@ public class Config {
                 option.setTimeReset(maxTime);
             }
 
+            JSONObject snipe = (JSONObject) jsonObject.get("snipe");
+            option.setSnipe(snipe.getBoolean("snipe"));
+            option.setSnipeLocation(S2LatLng.fromDegrees(snipe.getDouble("latitude"), snipe.getDouble("longitude")));
+            option.setSnipePokemonName(snipe.getString("pokemon_name"));
+
+            option.setSnipeAvgWalkingSpeed(snipe.getDouble("avg_speed_walking"));
+            option.setSnipeSpeedRange(snipe.getDouble("speed_range"));
+            option.setSnipeLocationUpdateIntervalMs(snipe.getInt("location_update_interval_ms"));
+            option.setSnipeHeartBeatIntervalMs(snipe.getInt("heart_beat_interval_ms"));
+            
+            
             JSONObject dropping = (JSONObject) jsonObject.get("drop_item");
             option.setBallsToKeep(dropping.getInt("balls_to_keep"));
             option.setPotionsToKeep(dropping.getInt("potions_to_keep"));

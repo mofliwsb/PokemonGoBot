@@ -17,7 +17,9 @@ import com.pokegoapi.api.map.pokemon.CatchResult;
 import com.pokegoapi.api.map.pokemon.CatchablePokemon;
 import com.pokegoapi.api.map.pokemon.EvolutionResult;
 import com.pokegoapi.api.pokemon.Pokemon;
+import com.pokegoapi.exceptions.AsyncCaptchaActiveException;
 import com.pokegoapi.exceptions.AsyncPokemonGoException;
+import com.pokegoapi.exceptions.CaptchaActiveException;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.google.common.geometry.S2LatLng;
@@ -72,10 +74,9 @@ public class SimplePokemonBot implements PokemonBot {
 
         LocationListener locationListener = new SimpleLocationListener(this);
 
-        BotWalker botWalker = new BotWalker(this, options.getStartingLocation(), locationListener, heartBeatListener, options);
+        botWalker = new BotWalker(this, options.getStartingLocation(), locationListener, heartBeatListener, options);
 //        botWalker.addPostStepActivity(catchPokemonActivity);
 
-        this.botWalker = botWalker;
         this.state = State.NAN;
         this.options = options;
     }
@@ -121,60 +122,73 @@ public class SimplePokemonBot implements PokemonBot {
     	}
     	return minPs;
     }
+
     
     @Override
-    public void wander() throws LoginFailedException, RemoteServerException{
-    	List<Pokestop> pokestops;
-
-        int retry = 2;
-    	int n = 0;
-        do{
-        	pokestops = getNearbyPokestops();
-            logger.info("Found " + pokestops.size() + " Pokestops nearby");
-        	
-	        if(pokestops.size()==0){
-	        	if(api.hasChallenge()){
-	        		VerifyCaptcha.completeCaptcha(api, api.getChallengeURL(), logger);
-	        		while(api.hasChallenge())
-	                	sleep(60000);		// wait until captcha is resolved
-	        	}
-		        else{
-		        	sleep(60000);
-		        }
-	        }
-        } while(n++<retry && pokestops.size()==0);
-        
+    public void run() throws LoginFailedException, RemoteServerException, CaptchaActiveException{
+    	List<Pokestop> pokestops = null;
         HashMap<Pokestop, Long> psMap = new HashMap<Pokestop, Long>();
-        for(Pokestop ps : pokestops){
-        	psMap.put(ps,  0L);
-        }
-        
-        while(true){
-        	Pokestop ps = getNextPokestop(psMap);
-        	if(ps==null){
-            	logger.info("No pokestop to loot, sleeping...");
-        		sleep(600000);
-        		continue;
-        	}
-        	
-	    	S2LatLng target = S2LatLng.fromDegrees(ps.getLatitude(), ps.getLongitude());
-            logger.info("Walking to " + ps.getDetails().getName() + " " + LocationToString(target) + " - "
-                    + this.getCurrentLocation().getEarthDistance(target) + "m away");
 
-            try{
-	            botWalker.walkTo(getCurrentLocation(), target);
-	            
-	            longSleep();
-	            
-	            lootPokestop(ps);
-            } finally {
-            	psMap.put(ps, System.currentTimeMillis() + 10*60*1000); // don't visit again in 10 mins
-            }
+    	// keep running after captcha is resolved
+        while(true){
+	    	try{
+	    		if(pokestops==null || pokestops.size()==0)
+	    		{
+	    			pokestops = getNearbyPokestops();
+			        for(Pokestop ps : pokestops){
+			        	psMap.put(ps,  0L);
+			        }
+	    		}
+	            logger.info("Found " + pokestops.size() + " Pokestops nearby");
+
+	            if(pokestops.size()==0){
+
+	            	// getNearbyPokestops does not throw CaptchaActiveException sometimes, check here
+	            	if(api.hasChallenge()){
+	            		throw new CaptchaActiveException(new AsyncCaptchaActiveException("check auth required"));
+	            	}
+	            	
+		        	sleep(10*60*1000);	// 10 mins
+		        	continue;
+		        }
+		        
+	            // looping each pokestop
+		        while(true){
+		        	logger.debug("player experience is: " + api.getPlayerProfile().getStats().getExperience());
+
+		        	Pokestop ps = getNextPokestop(psMap);
+		        	if(ps==null){
+		            	logger.info("No pokestop to loot, sleeping...");
+		        		sleep(10*60*1000);		// 10 mins
+		        		continue;
+		        	}
+		        	
+			    	S2LatLng target = S2LatLng.fromDegrees(ps.getLatitude(), ps.getLongitude());
+		            logger.info("Walking to " + ps.getDetails().getName() + " " + LocationToString(target) + " - "
+		                    + this.getCurrentLocation().getEarthDistance(target) + "m away");
+		
+		            try{
+			            botWalker.walkTo(getCurrentLocation(), target);
+			            
+			            longSleep();
+			            
+			            lootPokestop(ps);
+		            } finally {
+		            	// don't visit the same pokestop in 10 mins in case of any exception
+		            	psMap.put(ps, System.currentTimeMillis() + 10*60*1000);
+		            }
+		        }
+	    	} catch(CaptchaActiveException e){
+	    		VerifyCaptcha.completeCaptcha(api, api.getChallengeURL(), logger);
+	    		
+	    		while(api.hasChallenge())
+	            	sleep(30*1000);	// keep waiting 30 seconds until captcha is resolved
+	    	}
         }
     }
     
     
-    public void wander_last() throws LoginFailedException, RemoteServerException{
+    public void wander_last() throws LoginFailedException, RemoteServerException, CaptchaActiveException{
     	String lastPokestopId = "";
     	while(true){
 	    	List<Pokestop> pokestops = getNearbyPokestops();
@@ -229,12 +243,8 @@ public class SimplePokemonBot implements PokemonBot {
     	}
     }
     
-    public void dropItems() {
-    	try {
-			api.getInventories().updateInventories(true);
-		} catch (LoginFailedException | RemoteServerException e1) {
-			logger.debug("error when updating inventory before dropping items.");
-		}
+    public void dropItems() throws LoginFailedException, CaptchaActiveException, RemoteServerException {
+		api.getInventories().updateInventories(true);
 
     	int keepPotion = options.getPotionsToKeep();
     	int keepRevive = options.getRevivesToKeep();
@@ -398,7 +408,7 @@ public class SimplePokemonBot implements PokemonBot {
         return false;
     }
 
-    public final boolean fixSoftBan(S2LatLng destination) throws LoginFailedException, RemoteServerException {
+    public final boolean fixSoftBan(S2LatLng destination) throws LoginFailedException, RemoteServerException, CaptchaActiveException {
         this.getWalker().runTo(this.getCurrentLocation(), destination);
         setCurrentLocation(destination);
         Optional<Pokestop> nearest = getNearestPokestop();
@@ -446,7 +456,7 @@ public class SimplePokemonBot implements PokemonBot {
         return false;
     }
 
-    public final Optional<Pokestop> getNearestPokestop() {
+    public final Optional<Pokestop> getNearestPokestop() throws LoginFailedException, CaptchaActiveException, RemoteServerException {
         List<Pokestop> pokestops = getNearbyPokestops();
         return pokestops.stream().filter(Pokestop::canLoot).findFirst();
     }
@@ -465,10 +475,9 @@ public class SimplePokemonBot implements PokemonBot {
         return "";
     }
 
-    public List<Pokestop> getNearbyPokestops() {
-        return getPokestops().stream().filter(pokestop ->
+    public List<Pokestop> getNearbyPokestops() throws LoginFailedException, CaptchaActiveException, RemoteServerException {
+        return getMap().getMapObjects().getPokestops().stream().filter(pokestop ->
                 getCurrentLocation().getEarthDistance(S2LatLng.fromDegrees(pokestop.getLatitude(), pokestop.getLongitude())) <= options.getMaxDistance() 
-//                && pokestop.getCooldownCompleteTimestampMs()==0
                 ).sorted(
                 (Pokestop a, Pokestop b) ->
                         Double.compare(
@@ -478,7 +487,7 @@ public class SimplePokemonBot implements PokemonBot {
     }
 
 
-    public List<ReleasePokemonResponseOuterClass.ReleasePokemonResponse.Result> doTransfers(boolean forceTransfer) throws LoginFailedException, RemoteServerException {
+    public List<ReleasePokemonResponseOuterClass.ReleasePokemonResponse.Result> doTransfers(boolean forceTransfer) throws LoginFailedException, RemoteServerException, CaptchaActiveException {
         if (!options.isTransferPokemon() && !forceTransfer)
             return new ArrayList<>();
         TransferPokemonActivity a = new TransferPokemonActivity(this, options);
@@ -486,7 +495,7 @@ public class SimplePokemonBot implements PokemonBot {
     }
 
 
-    public void manageEggs() {
+    public void manageEggs() throws CaptchaActiveException, RemoteServerException, LoginFailedException {
         if (!options.isManageEggs())
             return;
         try {
@@ -535,7 +544,7 @@ public class SimplePokemonBot implements PokemonBot {
         return getApi().getMap();
     }
 
-    public List<CatchResult> catchNearbyPokemon() throws LoginFailedException, RemoteServerException {
+    public List<CatchResult> catchNearbyPokemon() throws LoginFailedException, RemoteServerException, CaptchaActiveException {
         updateOpStatus(State.CATCHING);
         List<CatchablePokemon> catchablePokemon = getCatchablePokemon();
         if (catchablePokemon.size() == 0 || options.isCatchPokemon()) {
@@ -549,16 +558,6 @@ public class SimplePokemonBot implements PokemonBot {
 //        }
 
         return CatchPokemon.catchPokemon(logger, this, catchablePokemon);
-    }
-
-    public final Collection<Pokestop> getPokestops() {
-        try {
-            return getMap().getMapObjects().getPokestops();
-        } catch (AsyncPokemonGoException | RemoteServerException | LoginFailedException e) {
-            logger.debug("Error getting pokestops", e);
-        }
-
-        return new ArrayList<>();
     }
 
     public Collection<FortDataOuterClass.FortData> getGyms() {
@@ -581,7 +580,7 @@ public class SimplePokemonBot implements PokemonBot {
         return new ArrayList<>();
     }
 
-    public synchronized List<PokestopLootResult> lootNearbyPokestops(boolean walkToStops) throws LoginFailedException, RemoteServerException {
+    public synchronized List<PokestopLootResult> lootNearbyPokestops(boolean walkToStops) throws LoginFailedException, RemoteServerException, CaptchaActiveException {
 
         if (options.isLootPokestops())
             return new ArrayList<>();
@@ -618,18 +617,13 @@ public class SimplePokemonBot implements PokemonBot {
     }
 
     
-    public PokestopLootResult lootPokestop(Pokestop pokestop) throws LoginFailedException, RemoteServerException {
+    public PokestopLootResult lootPokestop(Pokestop pokestop) throws LoginFailedException, RemoteServerException, CaptchaActiveException {
         updateOpStatus(State.LOOTING);
         PokestopLootResult result = LootPokestop.lootPokestop(logger, pokestop);
         if(result==null){
         	return null;
         }
         if(result.getResult()==Result.OUT_OF_RANGE){
-        	if(api.hasChallenge()){
-        		VerifyCaptcha.completeCaptcha(api, api.getChallengeURL(), logger);
-        		while(api.hasChallenge())
-                	sleep(1000*60*60);		// wait until captcha is resolved
-        	}
         	
         	longSleep();
         	result = LootPokestop.lootPokestop(logger, pokestop);
@@ -639,7 +633,7 @@ public class SimplePokemonBot implements PokemonBot {
         else if(result.getResult()==Result.INVENTORY_FULL){
         	dropItems();
         	
-        	sleep(5000); // sleep 5 seconds after dropping items
+        	longSleep();
         	result = LootPokestop.lootPokestop(logger, pokestop);
         }
         

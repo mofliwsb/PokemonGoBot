@@ -2,6 +2,7 @@ package com.pokemongobot.tasks;
 
 import POGOProtos.Networking.Responses.ReleasePokemonResponseOuterClass.ReleasePokemonResponse.Result;
 import com.pokegoapi.api.pokemon.Pokemon;
+import com.pokegoapi.exceptions.CaptchaActiveException;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokemongobot.Options;
@@ -27,11 +28,11 @@ public class TransferPokemonActivity implements BotActivity {
     }
 
     @Override
-    public void performActivity() throws LoginFailedException, RemoteServerException {
+    public void performActivity() throws LoginFailedException, RemoteServerException, CaptchaActiveException {
         this.transferPokemon();
     }
 
-    public List<Result> transferPokemon() throws LoginFailedException, RemoteServerException {
+    public List<Result> transferPokemon() throws LoginFailedException, RemoteServerException, CaptchaActiveException {
         List<Pokemon> pokemonList = bot.getInventory().getPokebank().getPokemons();
         if(pokemonList==null || pokemonList.size()==0)
         	return new ArrayList<Result>();

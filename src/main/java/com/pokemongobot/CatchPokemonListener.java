@@ -9,6 +9,7 @@ import com.pokegoapi.api.map.pokemon.CatchablePokemon;
 import com.pokegoapi.api.pokemon.HatchedEgg;
 
 import POGOProtos.Enums.EncounterTypeOuterClass.EncounterType;
+import POGOProtos.Enums.PokemonFamilyIdOuterClass.PokemonFamilyId;
 
 public class CatchPokemonListener implements PokemonListener {
 
@@ -33,11 +34,16 @@ public class CatchPokemonListener implements PokemonListener {
 		// TODO Auto-generated method stub
 		return false;
 	}
-
+	
 	@Override
 	public void onCatchAttempted(PokemonGo api, CatchablePokemon pokemon, Pokeball pokeball, int throwCount) {
-		// TODO Auto-generated method stub
 		logger.debug("catch attempted, using " + pokeball.name());
+	}
+
+	@Override
+	public void onBuddyFindCandy(PokemonGo arg0, PokemonFamilyId arg1, int arg2) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

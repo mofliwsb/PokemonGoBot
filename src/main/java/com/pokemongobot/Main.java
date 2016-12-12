@@ -6,6 +6,7 @@ import com.pokegoapi.auth.CredentialProvider;
 import com.pokegoapi.auth.GoogleAutoCredentialProvider;
 import com.pokegoapi.auth.PtcCredentialProvider;
 import com.pokegoapi.exceptions.AsyncPokemonGoException;
+import com.pokegoapi.exceptions.CaptchaActiveException;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.google.common.geometry.S2LatLng;
@@ -50,7 +51,7 @@ public class Main extends javafx.application.Application {
 		new Main();
     }
 
-    public static PokemonGo buildPokemonGo(Options option) throws LoginFailedException, RemoteServerException {
+    public static PokemonGo buildPokemonGo(Options option) throws LoginFailedException, RemoteServerException, CaptchaActiveException {
         OkHttpClient client;
 
         if (option.getProxy() != null) {
@@ -88,11 +89,11 @@ public class Main extends javafx.application.Application {
         return pokemonGo;
     }
 
-    private static CredentialProvider ptcAuthentication(OkHttpClient client, String username, String password) throws LoginFailedException, RemoteServerException {
+    private static CredentialProvider ptcAuthentication(OkHttpClient client, String username, String password) throws LoginFailedException, RemoteServerException, CaptchaActiveException {
         return new PtcCredentialProvider(client, username, password);
     }
 
-    private static CredentialProvider googleAuthentication(OkHttpClient client, String username, String password) throws LoginFailedException, RemoteServerException {
+    private static CredentialProvider googleAuthentication(OkHttpClient client, String username, String password) throws LoginFailedException, RemoteServerException, CaptchaActiveException {
         return new GoogleAutoCredentialProvider(client, username, password);
     }
 

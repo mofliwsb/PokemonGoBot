@@ -7,6 +7,7 @@ import com.pokegoapi.api.inventory.Inventories;
 import com.pokegoapi.api.pokemon.EggPokemon;
 import com.pokegoapi.api.pokemon.HatchedEgg;
 import com.pokegoapi.exceptions.AsyncPokemonGoException;
+import com.pokegoapi.exceptions.CaptchaActiveException;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import org.apache.log4j.Logger;
@@ -19,16 +20,12 @@ import java.util.stream.Collectors;
 
 public class HatchEgg {
 
-    public static List<HatchedEgg> getHatchedEggs(Logger logger, Hatchery hatchery) {
-        try {
-            final List<HatchedEgg> hatchedEggs = hatchery.queryHatchedEggs();
-            if (hatchedEggs != null && hatchedEggs.size() > 0) {
-                hatchedEggs.forEach(egg -> {
-                    logger.info("Hatched egg " + egg.toString());
-                });
-            }
-        } catch (RemoteServerException | LoginFailedException e) {
-            logger.error("Error getting hatched eggs", e);
+    public static List<HatchedEgg> getHatchedEggs(Logger logger, Hatchery hatchery) throws CaptchaActiveException, RemoteServerException, LoginFailedException {
+        final List<HatchedEgg> hatchedEggs = hatchery.queryHatchedEggs();
+        if (hatchedEggs != null && hatchedEggs.size() > 0) {
+            hatchedEggs.forEach(egg -> {
+                logger.info("Hatched egg " + egg.toString());
+            });
         }
         return new ArrayList<>();
     }
@@ -54,28 +51,22 @@ public class HatchEgg {
         return null;
     }
 
-    public static List<EggIncubator> fillIncubators(Logger logger, Inventories inventories) {
-        final List<EggIncubator> filled = new ArrayList<>(inventories.getHatchery().getEggs().size());
-        getIncubators(inventories).forEach(incubator -> {
+    public static List<EggIncubator> fillIncubators(Logger logger, Inventories inventories) throws CaptchaActiveException, LoginFailedException, RemoteServerException {
+        List<EggIncubator> filled = new ArrayList<>(inventories.getHatchery().getEggs().size());
+        getIncubators(inventories);
+        
+        for(EggIncubator incubator : filled){
             EggPokemon egg = getAvailableEgg(inventories);
             if (egg != null) {
-                Result result = hatchEgg(logger, egg, incubator);
+                Result result = incubator.hatchEgg(egg);
                 if (result != null) {
                     logger.info("Putting " + egg.getEggKmWalkedTarget() + " in incubator");
                     filled.add(incubator);
                 }
             }
-        });
+        }
         return filled;
     }
 
-    public static Result hatchEgg(Logger logger, EggPokemon egg, EggIncubator incubator) {
-        try {
-            return incubator.hatchEgg(egg);
-        } catch (AsyncPokemonGoException | LoginFailedException | RemoteServerException e) {
-            logger.debug("Failed hatching egg", e);
-        }
-        return null;
-    }
 
 }

@@ -3,6 +3,7 @@ package com.pokemongobot.actions;
 import com.pokegoapi.api.map.fort.Pokestop;
 import com.pokegoapi.api.map.fort.PokestopLootResult;
 import com.pokegoapi.exceptions.AsyncPokemonGoException;
+import com.pokegoapi.exceptions.CaptchaActiveException;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 
@@ -14,7 +15,7 @@ import java.util.List;
 
 public class LootPokestop {
 
-    public static List<PokestopLootResult> lootPokestops(final Logger logger, final List<Pokestop> pokestops) throws LoginFailedException, RemoteServerException {
+    public static List<PokestopLootResult> lootPokestops(final Logger logger, final List<Pokestop> pokestops) throws LoginFailedException, RemoteServerException, CaptchaActiveException {
         final List<PokestopLootResult> result = new ArrayList<>(pokestops.size());
         for(Pokestop pokestop : pokestops){
             PokestopLootResult r;
@@ -25,7 +26,7 @@ public class LootPokestop {
         return result;
     }
 
-    public static PokestopLootResult lootPokestop(final Logger logger, final Pokestop pokestop) throws LoginFailedException, RemoteServerException {
+    public static PokestopLootResult lootPokestop(final Logger logger, final Pokestop pokestop) throws LoginFailedException, RemoteServerException, CaptchaActiveException {
 //        try {
             if (pokestop.canLoot()) {
                 PokestopLootResult pokestopLootResult = pokestop.loot();

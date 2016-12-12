@@ -1,5 +1,6 @@
 package com.pokemongobot.actions;
 
+import com.pokegoapi.exceptions.CaptchaActiveException;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.google.common.geometry.S2LatLng;
@@ -65,17 +66,17 @@ public class BotWalker {
         this.postStepActivities.add(activity);
     }
 
-    public synchronized void performPostStepActivities() throws LoginFailedException, RemoteServerException {
+    public synchronized void performPostStepActivities() throws LoginFailedException, RemoteServerException, CaptchaActiveException {
     	for(BotActivity activity : postStepActivities){
     		activity.performActivity();
     	}
     }
 
-    protected synchronized void performHeartBeat() throws LoginFailedException, RemoteServerException {
+    public synchronized void performHeartBeat() throws LoginFailedException, RemoteServerException, CaptchaActiveException {
         heartBeatListener.heartBeat();
     }
 
-    public synchronized void walkTo(final S2LatLng start, final S2LatLng end) throws LoginFailedException, RemoteServerException {
+    public synchronized void walkTo(final S2LatLng start, final S2LatLng end) throws LoginFailedException, RemoteServerException, CaptchaActiveException {
     	
         S2LatLng[] steps = getStepsToDestination(start, end, randomizeSpeed()*LOCATION_UPDATE_INTERVAL_MS/1000);
         if (steps == null || steps.length==0) {
@@ -91,7 +92,7 @@ public class BotWalker {
         }
     }
 
-    public synchronized void runTo(final S2LatLng origin, final S2LatLng destination) throws LoginFailedException, RemoteServerException {
+    public synchronized void runTo(final S2LatLng origin, final S2LatLng destination) throws LoginFailedException, RemoteServerException, CaptchaActiveException {
         S2LatLng[] steps = getStepsToDestination(origin, destination, options.getRunningStepDistance());
         setCurrentLocation(origin);
         if (steps == null) {

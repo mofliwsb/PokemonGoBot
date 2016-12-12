@@ -1,5 +1,6 @@
 package com.pokemongobot.listeners;
 
+import com.pokegoapi.exceptions.CaptchaActiveException;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokemongobot.PokemonBot;
@@ -28,7 +29,7 @@ public class SimpleHeartBeatListener implements HeartBeatListener {
 
 
     @Override
-    public synchronized void heartBeat() throws LoginFailedException, RemoteServerException
+    public synchronized void heartBeat() throws LoginFailedException, RemoteServerException, CaptchaActiveException
     {
         if (shouldPulse() && (incrementHeartBeat() % heartbeatPace == 0))
         {
